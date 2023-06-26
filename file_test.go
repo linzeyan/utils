@@ -2,12 +2,12 @@ package utils
 
 import (
 	"bufio"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +16,7 @@ const testDir = "testdata"
 func createDir(dir string) {
 	err := os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal().Msgf("%v", err)
 	}
 }
 
@@ -26,7 +26,7 @@ func TestCopyFile(t *testing.T) {
 	dstFile := filepath.Join(testDir, "text_copy.txt")
 	_, err := os.Create(srcFile)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal().Msgf("%v", err)
 	}
 
 	err = CopyFile(srcFile, dstFile)
@@ -49,7 +49,7 @@ func TestListFiles(t *testing.T) {
 	for i := range fileList {
 		_, err := os.Create(filepath.Join(testDir, fileList[i]))
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal().Msgf("%v", err)
 		}
 	}
 
@@ -84,11 +84,11 @@ func TestSkipFirstRow(t *testing.T) {
 		file := filepath.Join(testDir, "test.txt")
 		err := os.WriteFile(file, []byte(strings.Join(testCase.data, "\n")), os.ModePerm)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal().Msgf("%v", err)
 		}
 		f, err := os.Open(file)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal().Msgf("%v", err)
 		}
 		err = SkipFirstRow(f)
 		if err != nil {

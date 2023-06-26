@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -12,6 +11,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/rs/zerolog/log"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -22,7 +22,7 @@ func convertExcel(filePath, ext string, delimiter rune) error {
 	}
 	defer func() {
 		if err := excelFile.Close(); err != nil {
-			log.Fatalln(err)
+			log.Fatal().Msgf("%v", err)
 		}
 	}()
 
