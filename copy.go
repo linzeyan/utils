@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+/* CopyByReader copies the src Reader to the dst Writer. */
 func CopyByReader(src io.Reader, dst io.Writer) error {
 	buf := make([]byte, 1024*1024)
 	for {
@@ -23,6 +24,7 @@ func CopyByReader(src io.Reader, dst io.Writer) error {
 	}
 }
 
+/* CopyFile copies the src file to the dst file. */
 func CopyFile(src, dst string) error {
 	sourceFileStat, err := os.Stat(src)
 	if err != nil {
