@@ -10,8 +10,8 @@ import (
 	"strings"
 )
 
-/* HasNullByte checks the file has the ASCII 0 or not. */
-func HasNullByteByFile(filePath string) bool {
+/* HasNullByteInFile checks the file has the ASCII 0 or not. */
+func HasNullByteInFile(filePath string) bool {
 	f, err := os.ReadFile(filePath)
 	if err != nil {
 		return true
@@ -24,8 +24,8 @@ func HasNullByteByFile(filePath string) bool {
 	return false
 }
 
-/* HasNullByte checks the reader has the ASCII 0 or not. */
-func HasNullByteByReader(r io.Reader) bool {
+/* HasNullByteInReader checks the reader has the ASCII 0 or not. */
+func HasNullByteInReader(r io.Reader) bool {
 	data, err := io.ReadAll(r)
 	if err != nil {
 		return true
