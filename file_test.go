@@ -73,27 +73,35 @@ func TestListFiles(t *testing.T) {
 
 func TestSkipFirstRow(t *testing.T) {
 	createDir(testDir)
-	file := filepath.Join(testDir, "test.txt")
-	data := []string{"1", "6", "8"}
-	err := os.WriteFile(file, []byte(strings.Join(data, "\n")), os.ModePerm)
-	if err != nil {
-		log.Fatalln(err)
+	testCases := []struct {
+		data []string
+	}{
+		{[]string{"1", "6", "8"}},
+		{[]string{"apple", "banana", "pineapple"}},
+		{[]string{"a,$", "b^!", "|c~"}},
 	}
-	f, err := os.Open(file)
-	if err != nil {
-		log.Fatalln(err)
+	for _, testCase := range testCases {
+		file := filepath.Join(testDir, "test.txt")
+		err := os.WriteFile(file, []byte(strings.Join(testCase.data, "\n")), os.ModePerm)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		f, err := os.Open(file)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		err = SkipFirstRow(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+		b := bufio.NewScanner(f)
+		expected := testCase.data[1:]
+		i := 0
+		for b.Scan() {
+			assert.Equal(t, expected[i], b.Text())
+			i++
+		}
+		f.Close()
 	}
-	err = SkipFirstRow(f)
-	if err != nil {
-		t.Fatal(err)
-	}
-	b := bufio.NewScanner(f)
-	expected := data[1:]
-	i := 0
-	for b.Scan() {
-		assert.Equal(t, expected[i], b.Text())
-		i++
-	}
-	f.Close()
 	_ = os.RemoveAll(testDir)
 }
