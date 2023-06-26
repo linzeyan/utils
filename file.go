@@ -12,6 +12,57 @@ import (
 	"github.com/duke-git/lancet/v2/fileutil"
 )
 
+/* CopyByReader copies the src Reader to the dst Writer. */
+func CopyByReader(src io.Reader, dst io.Writer, buffer ...[]byte) error {
+	if len(buffer) == 0 {
+		buffer = append(buffer, make([]byte, 1024*4))
+	}
+	buf := buffer[0]
+	if buf == nil {
+		buf = make([]byte, 1024*4)
+	}
+	for {
+		n, err := src.Read(buf)
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
+			return fmt.Errorf("read: %w", err)
+		}
+		if _, err := dst.Write(buf[:n]); err != nil {
+			return fmt.Errorf("write: %w", err)
+		}
+	}
+}
+
+/* CopyFile copies the src file to the dst file. */
+func CopyFile(src, dst string) error {
+	sourceFileStat, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+	if !sourceFileStat.Mode().IsRegular() {
+		return err
+	}
+
+	source, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	destination, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		source.Close()
+		destination.Close()
+	}()
+
+	buf := make([]byte, 1024*4)
+	return CopyByReader(source, destination, buf)
+}
+
 /* ListFiles returns a slice containing file paths for a given content type and file extension. */
 func ListFiles(dir, contentType string, fileExteinsion ...string) []string {
 	var files []string
