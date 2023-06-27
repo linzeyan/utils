@@ -61,6 +61,20 @@ func ConvertExcelToTSV(filePath string) error {
 	return convertExcel(filePath, ".tsv", '\t')
 }
 
+/* RemoveNullByteInFile removes the ASCII 0 in the file. */
+func RemoveNullByteInFile(filePath string) error {
+	stat, err := os.Stat(filePath)
+	if err != nil {
+		return err
+	}
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+	b := bytes.ReplaceAll(data, []byte{0}, []byte{})
+	return os.WriteFile(filePath, b, stat.Mode())
+}
+
 /* RemoveNullByte removes the ASCII 0 in the data. */
 func RemoveNullByte(data []byte) *bytes.Reader {
 	b := bytes.ReplaceAll(data, []byte{0}, []byte{})

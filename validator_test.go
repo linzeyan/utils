@@ -65,7 +65,7 @@ func TestHasNullByteInReader(t *testing.T) {
 				assert.True(t, HasNullByteInReader(f))
 				return
 			}
-			assert.False(t, HasNullByteInFile(file))
+			assert.False(t, HasNullByteInReader(f))
 		})
 	}
 	_ = os.RemoveAll(testDir)
