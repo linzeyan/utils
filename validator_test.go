@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/rs/zerolog/log"
@@ -30,6 +31,38 @@ func TestHasNullByteInFile(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			if testCase.expected {
 				assert.True(t, HasNullByteInFile(file))
+				return
+			}
+			assert.False(t, HasNullByteInFile(file))
+		})
+	}
+	_ = os.RemoveAll(testDir)
+}
+
+func TestHasNullByteInReader(t *testing.T) {
+	createDir(testDir)
+	testCases := []struct {
+		name     string
+		data     []byte
+		expected bool
+	}{
+		{"1", []byte{0, 1, 2, 3}, true},
+		{"2", []byte{44, 55, 00, 77, 88}, true},
+	}
+	for _, testCase := range testCases {
+		file := filepath.Join(testDir, "test.txt")
+		err := os.WriteFile(file, testCase.data, os.ModePerm)
+		if err != nil {
+			log.Fatal().Msgf("%v", err)
+		}
+		t.Run(testCase.name, func(t *testing.T) {
+			f, err := os.Open(file)
+			if err != nil {
+				log.Fatal().Msgf("%v", err)
+			}
+			defer f.Close()
+			if testCase.expected {
+				assert.True(t, HasNullByteInReader(f))
 				return
 			}
 			assert.False(t, HasNullByteInFile(file))
@@ -240,4 +273,20 @@ func TestIsURL(t *testing.T) {
 			assert.False(t, IsURL(testCase.input))
 		})
 	}
+}
+
+func TestIsDarwin(t *testing.T) {
+	if runtime.GOOS == "darwin" {
+		assert.True(t, IsDarwin())
+		return
+	}
+	assert.False(t, IsDarwin())
+}
+
+func TestIsWindows(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		assert.True(t, IsWindows())
+		return
+	}
+	assert.False(t, IsWindows())
 }

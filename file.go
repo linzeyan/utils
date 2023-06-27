@@ -111,7 +111,7 @@ func SkipFirstRow(f *os.File) error {
 	return nil
 }
 
-/* UnZip unzips the file and save it to dst path. */
+/* UnZip unzips the file and save it to dst directory. */
 func UnZip(zip, dst string) error {
 	return fileutil.UnZip(zip, dst)
 }

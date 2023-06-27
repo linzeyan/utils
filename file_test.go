@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -40,6 +41,36 @@ func TestCopyFile(t *testing.T) {
 	src, _ := os.ReadFile(srcFile)
 	dst, _ := os.ReadFile(dstFile)
 	assert.Equal(t, src, dst)
+	_ = os.RemoveAll(testDir)
+}
+
+func TestCopyByReader(t *testing.T) {
+	createDir(testDir)
+	srcFile := filepath.Join(testDir, "test.txt")
+	dstFile := filepath.Join(testDir, "text_copy.txt")
+	err := os.WriteFile(srcFile, []byte{'\n', '\r'}, os.ModePerm)
+	if err != nil {
+		log.Fatal().Msgf("%v", err)
+	}
+
+	src, err := os.Open(srcFile)
+	if err != nil {
+		log.Fatal().Msgf("%v", err)
+	}
+	dst, err := os.Create(dstFile)
+	if err != nil {
+		log.Fatal().Msgf("%v", err)
+	}
+
+	err = CopyByReader(src, dst)
+	if err != nil {
+		assert.FileExistsf(t, dstFile, "dstFile not found")
+	}
+	src.Close()
+	dst.Close()
+	srcData, _ := os.ReadFile(srcFile)
+	dstData, _ := os.ReadFile(dstFile)
+	assert.Equal(t, srcData, dstData)
 	_ = os.RemoveAll(testDir)
 }
 
@@ -103,5 +134,40 @@ func TestSkipFirstRow(t *testing.T) {
 		}
 		f.Close()
 	}
+	_ = os.RemoveAll(testDir)
+}
+
+func TestZipAndUnZip(t *testing.T) {
+	createDir(testDir)
+	srcFile := filepath.Join(testDir, "test.csv")
+	err := os.WriteFile(srcFile, []byte{'\n', 1}, os.ModePerm)
+	if err != nil {
+		log.Fatal().Msgf("%v", err)
+	}
+	rawSrcData, err := os.ReadFile(srcFile)
+	if err != nil {
+		log.Fatal().Msgf("%v", err)
+	}
+	zipFile := strings.Replace(srcFile, filepath.Ext(srcFile), ".zip", 1)
+	err = Zip(srcFile, zipFile)
+	if err != nil {
+		log.Fatal().Msgf("%v", err)
+	}
+	zipData, err := os.ReadFile(zipFile)
+	if err != nil {
+		log.Fatal().Msgf("%v", err)
+	}
+	zipType := http.DetectContentType(zipData)
+	assert.Equal(t, "application/zip", zipType)
+
+	err = UnZip(zipFile, testDir)
+	if err != nil {
+		log.Fatal().Msgf("%v", err)
+	}
+	newSrcData, err := os.ReadFile(srcFile)
+	if err != nil {
+		log.Fatal().Msgf("%v", err)
+	}
+	assert.Equal(t, rawSrcData, newSrcData)
 	_ = os.RemoveAll(testDir)
 }
