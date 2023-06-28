@@ -112,6 +112,11 @@ func IsDarwin() bool {
 	return runtime.GOOS == "darwin"
 }
 
+/* IsLinux checks if host is linux. */
+func IsLinux() bool {
+	return runtime.GOOS == "linux"
+}
+
 /* IsDarwin checks if host is windows. */
 func IsWindows() bool {
 	return runtime.GOOS == "windows"

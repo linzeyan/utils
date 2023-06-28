@@ -224,18 +224,20 @@ func TestIsURL(t *testing.T) {
 	}
 }
 
-func TestIsDarwin(t *testing.T) {
-	if runtime.GOOS == "darwin" {
-		assert.True(t, IsDarwin())
-		return
+func TestOS(t *testing.T) {
+	assertion := assert.New(t)
+	switch runtime.GOOS {
+	case "darwin":
+		assertion.True(IsDarwin())
+		assertion.False(IsLinux())
+		assertion.False(IsWindows())
+	case "windows":
+		assertion.True(IsWindows())
+		assertion.False(IsDarwin())
+		assertion.False(IsLinux())
+	default:
+		assertion.True(IsLinux())
+		assertion.False(IsDarwin())
+		assertion.False(IsWindows())
 	}
-	assert.False(t, IsDarwin())
-}
-
-func TestIsWindows(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		assert.True(t, IsWindows())
-		return
-	}
-	assert.False(t, IsWindows())
 }
