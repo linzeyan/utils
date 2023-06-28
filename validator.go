@@ -11,31 +11,31 @@ import (
 )
 
 /* HasNullByteInFile checks the file has the ASCII 0 or not. */
-func HasNullByteInFile(filePath string) bool {
+func HasNullByteInFile(filePath string) (bool, error) {
 	f, err := os.ReadFile(filePath)
 	if err != nil {
-		return true
+		return false, err
 	}
 	for _, b := range f {
 		if b == 0 {
-			return true
+			return true, nil
 		}
 	}
-	return false
+	return false, err
 }
 
 /* HasNullByteInReader checks the reader has the ASCII 0 or not. */
-func HasNullByteInReader(r io.Reader) bool {
+func HasNullByteInReader(r io.Reader) (bool, error) {
 	data, err := io.ReadAll(r)
 	if err != nil {
-		return true
+		return false, err
 	}
 	for _, b := range data {
 		if b == 0 {
-			return true
+			return true, nil
 		}
 	}
-	return false
+	return false, err
 }
 
 /* IsDomain checks if i is a domain. */

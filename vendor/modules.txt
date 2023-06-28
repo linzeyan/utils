@@ -3,7 +3,11 @@
 github.com/davecgh/go-spew/spew
 # github.com/duke-git/lancet/v2 v2.2.2
 ## explicit; go 1.18
+github.com/duke-git/lancet/v2/convertor
 github.com/duke-git/lancet/v2/fileutil
+github.com/duke-git/lancet/v2/pointer
+github.com/duke-git/lancet/v2/structs
+github.com/duke-git/lancet/v2/validator
 # github.com/mattn/go-colorable v0.1.12
 ## explicit; go 1.13
 github.com/mattn/go-colorable

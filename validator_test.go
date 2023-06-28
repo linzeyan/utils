@@ -28,12 +28,14 @@ func TestHasNullByteInFile(t *testing.T) {
 		if err != nil {
 			log.Fatal().Msgf("%v", err)
 		}
+		b, err := HasNullByteInFile(file)
 		t.Run(testCase.name, func(t *testing.T) {
 			if testCase.expected {
-				assert.True(t, HasNullByteInFile(file))
+				assert.True(t, b)
+				assert.NoError(t, err)
 				return
 			}
-			assert.False(t, HasNullByteInFile(file))
+			assert.False(t, b)
 		})
 	}
 	_ = os.RemoveAll(testDir)
@@ -61,11 +63,13 @@ func TestHasNullByteInReader(t *testing.T) {
 				log.Fatal().Msgf("%v", err)
 			}
 			defer f.Close()
+			b, err := HasNullByteInReader(f)
 			if testCase.expected {
-				assert.True(t, HasNullByteInReader(f))
+				assert.True(t, b)
+				assert.NoError(t, err)
 				return
 			}
-			assert.False(t, HasNullByteInReader(f))
+			assert.False(t, b)
 		})
 	}
 	_ = os.RemoveAll(testDir)

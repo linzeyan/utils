@@ -11,6 +11,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/duke-git/lancet/v2/convertor"
 	"github.com/rs/zerolog/log"
 	"github.com/xuri/excelize/v2"
 )
@@ -131,4 +132,9 @@ func ReplaceDosToUnix(filePath string) error {
 	eol := regexp.MustCompile(`\r\n`)
 	f = eol.ReplaceAllLiteral(f, []byte{'\n'})
 	return os.WriteFile(filePath, f, stat.Mode())
+}
+
+/* ToInt64 converts v to int64 value, if input is not numerical, return 0 and error. */
+func ToInt64(v any) (int64, error) {
+	return convertor.ToInt(v)
 }
