@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -79,10 +80,6 @@ func ConvertStringToCharRune(s string) rune {
 	return r
 }
 
-func removeNullByte(data []byte) []byte {
-	return bytes.ReplaceAll(data, []byte{0}, []byte{})
-}
-
 /* RemoveNullByteInFile removes the ASCII 0 in the file. */
 func RemoveNullByteInFile(filePath string) error {
 	stat, err := os.Stat(filePath)
@@ -93,14 +90,24 @@ func RemoveNullByteInFile(filePath string) error {
 	if err != nil {
 		return err
 	}
-	b := removeNullByte(data)
+	b := RemoveNullByte(data)
 	return os.WriteFile(filePath, b, stat.Mode())
 }
 
+/* RemoveNullByteInReader removes the ASCII 0 in reader. */
+func RemoveNullByteInReader(reader io.Reader) (io.Reader, error) {
+	r, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+	b := RemoveNullByte(r)
+	buf := bytes.NewBuffer(b)
+	return buf, nil
+}
+
 /* RemoveNullByte removes the ASCII 0 in the data. */
-func RemoveNullByte(data []byte) *bytes.Reader {
-	b := removeNullByte(data)
-	return bytes.NewReader(b)
+func RemoveNullByte(data []byte) []byte {
+	return bytes.ReplaceAll(data, []byte{0}, []byte{})
 }
 
 /* ReplaceDelimiter replaces the old delimiter with the new delimiter in the filePath. */

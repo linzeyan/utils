@@ -10,18 +10,22 @@ import (
 	"strings"
 )
 
+func hasNullByte(data []byte) bool {
+	for _, b := range data {
+		if b == 0 {
+			return true
+		}
+	}
+	return false
+}
+
 /* HasNullByteInFile checks the file has the ASCII 0 or not. */
 func HasNullByteInFile(filePath string) (bool, error) {
 	f, err := os.ReadFile(filePath)
 	if err != nil {
 		return false, err
 	}
-	for _, b := range f {
-		if b == 0 {
-			return true, nil
-		}
-	}
-	return false, err
+	return hasNullByte(f), nil
 }
 
 /* HasNullByteInReader checks the reader has the ASCII 0 or not. */
@@ -30,12 +34,7 @@ func HasNullByteInReader(r io.Reader) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	for _, b := range data {
-		if b == 0 {
-			return true, nil
-		}
-	}
-	return false, err
+	return hasNullByte(data), nil
 }
 
 /* IsDomain checks if i is a domain. */

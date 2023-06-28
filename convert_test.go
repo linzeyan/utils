@@ -143,11 +143,15 @@ func TestRemoveNullByte(t *testing.T) {
 			requirement.Error(err)
 		}
 		t.Run(testCase.name, func(*testing.T) {
-			data, err := os.ReadFile(file)
+			data, err := os.Open(file)
 			if err != nil {
 				requirement.Error(err)
 			}
-			r := RemoveNullByte(data)
+			defer data.Close()
+			r, err := RemoveNullByteInReader(data)
+			if err != nil {
+				requirement.Error(err)
+			}
 			if testCase.expected {
 				assertion.True(HasNullByteInReader(r))
 				return
