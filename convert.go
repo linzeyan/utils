@@ -12,6 +12,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/bytedance/sonic"
 	"github.com/duke-git/lancet/v2/convertor"
 	"github.com/rs/zerolog/log"
 	"github.com/xuri/excelize/v2"
@@ -83,6 +84,26 @@ func ConvertStringToCharRune(s string) (rune, error) {
 		return 0, err
 	}
 	return r, nil
+}
+
+/* JSONMarshal returns the JSON encoding bytes of v. */
+func JSONMarshal(v any) ([]byte, error) {
+	return sonic.Marshal(v)
+}
+
+/* MarshalString returns the JSON encoding string of v. */
+func JSONMarshalString(v any) (string, error) {
+	return sonic.MarshalString(v)
+}
+
+/* JSONUnmarshal parses the JSON-encoded data and stores the result in the value pointed to by v. */
+func JSONUnmarshal(data []byte, v any) error {
+	return sonic.Unmarshal(data, v)
+}
+
+/* JSONUnmarshalString is like JSONUnmarshal, except buf is a string. */
+func JSONUnmarshalString(data string, v any) error {
+	return sonic.UnmarshalString(data, v)
 }
 
 /* RemoveNullByteInFile removes the ASCII 0 in the file. */
