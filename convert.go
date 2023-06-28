@@ -17,7 +17,8 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-func convertExcel(filePath, ext string, delimiter rune) error {
+/* ConvertExcelToTSV converts the Excel file to the text file by delimiter. */
+func ConvertExcel(filePath, ext string, delimiter rune) error {
 	excelFile, err := excelize.OpenFile(filePath)
 	if err != nil {
 		return err
@@ -29,7 +30,8 @@ func convertExcel(filePath, ext string, delimiter rune) error {
 	}()
 
 	for _, sheetName := range excelFile.GetSheetList() {
-		csvFile, err := os.Create(strings.Replace(filePath, filepath.Ext(filePath), "_"+sheetName+ext, 1))
+		fileName := strings.Replace(filePath, filepath.Ext(filePath), "_"+sheetName+ext, 1)
+		csvFile, err := os.Create(fileName)
 		if err != nil {
 			return err
 		}
@@ -55,29 +57,32 @@ func convertExcel(filePath, ext string, delimiter rune) error {
 
 /* ConvertExcelToCSV converts the Excel file to the CSV format file. */
 func ConvertExcelToCSV(filePath string) error {
-	return convertExcel(filePath, ".csv", ',')
+	return ConvertExcel(filePath, ".csv", ',')
 }
 
 /* ConvertExcelToTSV converts the Excel file to the TSV format file. */
 func ConvertExcelToTSV(filePath string) error {
-	return convertExcel(filePath, ".tsv", '\t')
+	return ConvertExcel(filePath, ".tsv", '\t')
 }
 
-/* ConvertStringToCharByte converts the given string(char) to a byte slice. */
-func ConvertStringToCharByte(s string) []byte {
-	r := ConvertStringToCharRune(s)
+/* ConvertStringToCharByte converts the given string(char) to a byte slice, if error returns nil. */
+func ConvertStringToCharByte(s string) ([]byte, error) {
+	r, err := ConvertStringToCharRune(s)
+	if err != nil {
+		return nil, err
+	}
 	b := make([]byte, utf8.RuneLen(r))
 	utf8.EncodeRune(b, r)
-	return b
+	return b, nil
 }
 
-/* ConvertStringToCharRune converts the given string(char) to a rune. */
-func ConvertStringToCharRune(s string) rune {
+/* ConvertStringToCharRune converts the given string(char) to rune, if error returns 0 and error. */
+func ConvertStringToCharRune(s string) (rune, error) {
 	r, _, _, err := strconv.UnquoteChar(s, '\'')
 	if err != nil {
-		return 0
+		return 0, err
 	}
-	return r
+	return r, nil
 }
 
 /* RemoveNullByteInFile removes the ASCII 0 in the file. */
@@ -120,7 +125,10 @@ func ReplaceDelimiter(filePath string, old, new string) error {
 	if err != nil {
 		return fmt.Errorf("stat file: %w", err)
 	}
-	b := ConvertStringToCharByte(new)
+	b, err := ConvertStringToCharByte(new)
+	if err != nil {
+		return fmt.Errorf("converts: %w", err)
+	}
 	eol := regexp.MustCompile(old)
 	f = eol.ReplaceAllLiteral(f, b)
 	return os.WriteFile(filePath, f, stat.Mode())
