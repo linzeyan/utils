@@ -10,6 +10,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const testDir = "testdata"
@@ -22,66 +23,72 @@ func createDir(dir string) {
 }
 
 func TestCopyFile(t *testing.T) {
+	assertion := assert.New(t)
+	requirement := require.New(t)
 	createDir(testDir)
 	srcFile := filepath.Join(testDir, "test.txt")
 	dstFile := filepath.Join(testDir, "text_copy.txt")
 	_, err := os.Create(srcFile)
-	if err != nil {
-		log.Fatal().Msgf("%v", err)
-	}
+	requirement.Nil(err)
 
 	err = CopyFile(srcFile, dstFile)
 	if err != nil {
 		assert.FileExistsf(t, dstFile, "dstFile not found")
+		requirement.Error(err)
 		_, ferr := os.Open(dstFile)
 		if ferr != nil {
-			t.Fatal(ferr)
+			requirement.Error(ferr)
 		}
 	}
-	src, _ := os.ReadFile(srcFile)
-	dst, _ := os.ReadFile(dstFile)
-	assert.Equal(t, src, dst)
-	_ = os.RemoveAll(testDir)
+	src, err := os.ReadFile(srcFile)
+	requirement.Nil(err)
+	dst, err := os.ReadFile(dstFile)
+	requirement.Nil(err)
+	assertion.Equal(src, dst)
+	if err := os.RemoveAll(testDir); err != nil {
+		requirement.Error(err)
+	}
 }
 
 func TestCopyByReader(t *testing.T) {
+	assertion := assert.New(t)
+	requirement := require.New(t)
 	createDir(testDir)
 	srcFile := filepath.Join(testDir, "test.txt")
 	dstFile := filepath.Join(testDir, "text_copy.txt")
 	err := os.WriteFile(srcFile, []byte{'\n', '\r'}, os.ModePerm)
-	if err != nil {
-		log.Fatal().Msgf("%v", err)
-	}
+	requirement.Nil(err)
 
 	src, err := os.Open(srcFile)
-	if err != nil {
-		log.Fatal().Msgf("%v", err)
-	}
+	requirement.Nil(err)
 	dst, err := os.Create(dstFile)
-	if err != nil {
-		log.Fatal().Msgf("%v", err)
-	}
+	requirement.Nil(err)
 
 	err = CopyByReader(src, dst)
 	if err != nil {
-		assert.FileExistsf(t, dstFile, "dstFile not found")
+		assertion.FileExistsf(dstFile, "dstFile not found")
+		requirement.Error(err)
 	}
 	src.Close()
 	dst.Close()
-	srcData, _ := os.ReadFile(srcFile)
-	dstData, _ := os.ReadFile(dstFile)
-	assert.Equal(t, srcData, dstData)
-	_ = os.RemoveAll(testDir)
+	srcData, err := os.ReadFile(srcFile)
+	requirement.Nil(err)
+	dstData, err := os.ReadFile(dstFile)
+	requirement.Nil(err)
+	assertion.Equal(srcData, dstData)
+	if err := os.RemoveAll(testDir); err != nil {
+		requirement.Error(err)
+	}
 }
 
 func TestListFiles(t *testing.T) {
+	assertion := assert.New(t)
+	requirement := require.New(t)
 	createDir(testDir)
 	fileList := []string{"a.csv", "a.txt"}
 	for i := range fileList {
 		_, err := os.Create(filepath.Join(testDir, fileList[i]))
-		if err != nil {
-			log.Fatal().Msgf("%v", err)
-		}
+		requirement.Nil(err)
 	}
 
 	testCases := []struct {
@@ -94,15 +101,19 @@ func TestListFiles(t *testing.T) {
 
 	for _, testCase := range testCases {
 		files := ListFiles(testDir, "text/plain; charset=utf-8", testCase.exts...)
-		assert.Equal(t, len(files), testCase.len)
+		assertion.Equal(len(files), testCase.len)
 		for i := range files {
-			assert.FileExists(t, files[i])
+			assertion.FileExists(files[i])
 		}
 	}
-	_ = os.RemoveAll(testDir)
+	if err := os.RemoveAll(testDir); err != nil {
+		requirement.Error(err)
+	}
 }
 
 func TestSkipFirstRow(t *testing.T) {
+	assertion := assert.New(t)
+	requirement := require.New(t)
 	createDir(testDir)
 	testCases := []struct {
 		data []string
@@ -111,63 +122,55 @@ func TestSkipFirstRow(t *testing.T) {
 		{[]string{"apple", "banana", "pineapple"}},
 		{[]string{"a,$", "b^!", "|c~"}},
 	}
+
 	for _, testCase := range testCases {
 		file := filepath.Join(testDir, "test.txt")
 		err := os.WriteFile(file, []byte(strings.Join(testCase.data, "\n")), os.ModePerm)
-		if err != nil {
-			log.Fatal().Msgf("%v", err)
-		}
+		requirement.Nil(err)
 		f, err := os.Open(file)
-		if err != nil {
-			log.Fatal().Msgf("%v", err)
-		}
+		requirement.Nil(err)
 		err = SkipFirstRow(f)
-		if err != nil {
-			t.Fatal(err)
-		}
+		assertion.Nil(err)
 		b := bufio.NewScanner(f)
 		expected := testCase.data[1:]
 		i := 0
 		for b.Scan() {
-			assert.Equal(t, expected[i], b.Text())
+			assertion.Equal(expected[i], b.Text())
 			i++
 		}
 		f.Close()
 	}
-	_ = os.RemoveAll(testDir)
+	if err := os.RemoveAll(testDir); err != nil {
+		requirement.Error(err)
+	}
 }
 
 func TestZipAndUnZip(t *testing.T) {
+	assertion := assert.New(t)
+	requirement := require.New(t)
 	createDir(testDir)
+
 	srcFile := filepath.Join(testDir, "test.csv")
 	err := os.WriteFile(srcFile, []byte{'\n', 1}, os.ModePerm)
-	if err != nil {
-		log.Fatal().Msgf("%v", err)
-	}
+	requirement.Nil(err)
+
 	rawSrcData, err := os.ReadFile(srcFile)
-	if err != nil {
-		log.Fatal().Msgf("%v", err)
-	}
+	requirement.Nil(err)
 	zipFile := strings.Replace(srcFile, filepath.Ext(srcFile), ".zip", 1)
+
 	err = Zip(srcFile, zipFile)
-	if err != nil {
-		log.Fatal().Msgf("%v", err)
-	}
+	assertion.Nil(err)
 	zipData, err := os.ReadFile(zipFile)
-	if err != nil {
-		log.Fatal().Msgf("%v", err)
-	}
+	requirement.Nil(err)
 	zipType := http.DetectContentType(zipData)
-	assert.Equal(t, "application/zip", zipType)
+	assertion.Equal("application/zip", zipType)
 
 	err = UnZip(zipFile, testDir)
-	if err != nil {
-		log.Fatal().Msgf("%v", err)
-	}
+	assertion.Nil(err)
 	newSrcData, err := os.ReadFile(srcFile)
-	if err != nil {
-		log.Fatal().Msgf("%v", err)
+	requirement.Nil(err)
+	assertion.Equal(rawSrcData, newSrcData)
+	if err := os.RemoveAll(testDir); err != nil {
+		requirement.Error(err)
 	}
-	assert.Equal(t, rawSrcData, newSrcData)
-	_ = os.RemoveAll(testDir)
 }

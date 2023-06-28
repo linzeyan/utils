@@ -43,8 +43,9 @@ func TestHasNullByte(t *testing.T) {
 			assertion.Equal(testCase.expected, b)
 		})
 	}
-	err := os.RemoveAll(testDir)
-	requirement.Nil(err)
+	if err := os.RemoveAll(testDir); err != nil {
+		requirement.Error(err)
+	}
 }
 
 func TestIsDomain(t *testing.T) {

@@ -81,9 +81,11 @@ func TestConvertStringToChar(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.input, func(*testing.T) {
-			b := ConvertStringToCharByte(testCase.input)
+			b, err := ConvertStringToCharByte(testCase.input)
+			assertion.Nil(err)
 			assertion.Equal(testCase.input, string(b))
-			c := ConvertStringToCharRune(testCase.input)
+			c, err := ConvertStringToCharRune(testCase.input)
+			assertion.Nil(err)
 			assertion.Equal(testCase.expected, c)
 			assertion.Equal(testCase.input, fmt.Sprintf("%c", c))
 		})
