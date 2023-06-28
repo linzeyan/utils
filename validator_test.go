@@ -7,11 +7,13 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestHasNullByteInFile(t *testing.T) {
+func TestHasNullByte(t *testing.T) {
+	assertion := assert.New(t)
+	requirement := require.New(t)
 	createDir(testDir)
 	testCases := []struct {
 		name     string
@@ -22,57 +24,27 @@ func TestHasNullByteInFile(t *testing.T) {
 		{"2", []byte{44, 55, 66, 77, 88}, false},
 		{"3", []byte{111, 222}, false},
 	}
-	for _, testCase := range testCases {
-		file := filepath.Join(testDir, "test.txt")
-		err := os.WriteFile(file, testCase.data, os.ModePerm)
-		if err != nil {
-			log.Fatal().Msgf("%v", err)
-		}
-		b, err := HasNullByteInFile(file)
-		t.Run(testCase.name, func(t *testing.T) {
-			if testCase.expected {
-				assert.True(t, b)
-				assert.NoError(t, err)
-				return
-			}
-			assert.False(t, b)
-		})
-	}
-	_ = os.RemoveAll(testDir)
-}
 
-func TestHasNullByteInReader(t *testing.T) {
-	createDir(testDir)
-	testCases := []struct {
-		name     string
-		data     []byte
-		expected bool
-	}{
-		{"1", []byte{0, 1, 2, 3}, true},
-		{"2", []byte{44, 55, 00, 77, 88}, true},
-	}
 	for _, testCase := range testCases {
 		file := filepath.Join(testDir, "test.txt")
 		err := os.WriteFile(file, testCase.data, os.ModePerm)
-		if err != nil {
-			log.Fatal().Msgf("%v", err)
-		}
-		t.Run(testCase.name, func(t *testing.T) {
-			f, err := os.Open(file)
-			if err != nil {
-				log.Fatal().Msgf("%v", err)
-			}
-			defer f.Close()
+		requirement.Nil(err)
+		t.Run("InFile "+testCase.name, func(*testing.T) {
+			b, err := HasNullByteInFile(file)
+			assertion.Nil(err)
+			assertion.Equal(testCase.expected, b)
+		})
+		f, err := os.Open(file)
+		requirement.Nil(err)
+		defer f.Close()
+		t.Run("InReader "+testCase.name, func(*testing.T) {
 			b, err := HasNullByteInReader(f)
-			if testCase.expected {
-				assert.True(t, b)
-				assert.NoError(t, err)
-				return
-			}
-			assert.False(t, b)
+			assertion.Nil(err)
+			assertion.Equal(testCase.expected, b)
 		})
 	}
-	_ = os.RemoveAll(testDir)
+	err := os.RemoveAll(testDir)
+	requirement.Nil(err)
 }
 
 func TestIsDomain(t *testing.T) {
@@ -87,13 +59,10 @@ func TestIsDomain(t *testing.T) {
 		{"dns-admin.google.com", true},
 		{"dns-admin.google.com.", true},
 	}
+
 	for _, testCase := range testCases {
 		t.Run(fmt.Sprintf("%s", testCase.input), func(t *testing.T) {
-			if testCase.expected {
-				assert.True(t, IsDomain(testCase.input))
-				return
-			}
-			assert.False(t, IsDomain(testCase.input))
+			assert.Equal(t, testCase.expected, IsDomain(testCase.input))
 		})
 	}
 }
@@ -109,13 +78,10 @@ func TestIsPathExist(t *testing.T) {
 		{"root_test.go", false},
 		{"/dev/null", !IsWindows()},
 	}
+
 	for _, testCase := range testCases {
 		t.Run(testCase.input, func(t *testing.T) {
-			if testCase.expected {
-				assert.True(t, IsPathExist(testCase.input))
-				return
-			}
-			assert.False(t, IsPathExist(testCase.input))
+			assert.Equal(t, testCase.expected, IsPathExist(testCase.input))
 		})
 	}
 }
@@ -131,13 +97,10 @@ func TestIsIP(t *testing.T) {
 		{"example.com", false},
 		{"2404:6800:4008:c01::65", true},
 	}
+
 	for _, testCase := range testCases {
 		t.Run(testCase.input, func(t *testing.T) {
-			if testCase.expected {
-				assert.True(t, IsIP(testCase.input))
-				return
-			}
-			assert.False(t, IsIP(testCase.input))
+			assert.Equal(t, testCase.expected, IsIP(testCase.input))
 		})
 	}
 }
@@ -154,13 +117,10 @@ func TestIsCIDR(t *testing.T) {
 		{"2404:6800:4008:c01::65/32", true},
 		{"fe80::aede:48ff:fe00:1122/64", true},
 	}
+
 	for _, testCase := range testCases {
 		t.Run(testCase.input, func(t *testing.T) {
-			if testCase.expected {
-				assert.True(t, IsCIDR(testCase.input))
-				return
-			}
-			assert.False(t, IsCIDR(testCase.input))
+			assert.Equal(t, testCase.expected, IsCIDR(testCase.input))
 		})
 	}
 }
@@ -176,13 +136,10 @@ func TestIsIPv4(t *testing.T) {
 		{"example.com", false},
 		{"2404:6800:4008:c01::65", false},
 	}
+
 	for _, testCase := range testCases {
 		t.Run(testCase.input, func(t *testing.T) {
-			if testCase.expected {
-				assert.True(t, IsIPv4(testCase.input))
-				return
-			}
-			assert.False(t, IsIPv4(testCase.input))
+			assert.Equal(t, testCase.expected, IsIPv4(testCase.input))
 		})
 	}
 }
@@ -199,13 +156,10 @@ func TestIsIPv4CIDR(t *testing.T) {
 		{"example.com/22", false},
 		{"2404:6800:4008:c01::65/64", false},
 	}
+
 	for _, testCase := range testCases {
 		t.Run(testCase.input, func(t *testing.T) {
-			if testCase.expected {
-				assert.True(t, IsIPv4CIDR(testCase.input))
-				return
-			}
-			assert.False(t, IsIPv4CIDR(testCase.input))
+			assert.Equal(t, testCase.expected, IsIPv4CIDR(testCase.input))
 		})
 	}
 }
@@ -221,13 +175,10 @@ func TestIsIPv6(t *testing.T) {
 		{"example.com", false},
 		{"2404:6800:4008:c01::65", true},
 	}
+
 	for _, testCase := range testCases {
 		t.Run(testCase.input, func(t *testing.T) {
-			if testCase.expected {
-				assert.True(t, IsIPv6(testCase.input))
-				return
-			}
-			assert.False(t, IsIPv6(testCase.input))
+			assert.Equal(t, testCase.expected, IsIPv6(testCase.input))
 		})
 	}
 }
@@ -243,13 +194,10 @@ func TestIsIPv6CIDR(t *testing.T) {
 		{"example.com/7", false},
 		{"2404:6800:4008:c01::65/10", true},
 	}
+
 	for _, testCase := range testCases {
 		t.Run(testCase.input, func(t *testing.T) {
-			if testCase.expected {
-				assert.True(t, IsIPv6CIDR(testCase.input))
-				return
-			}
-			assert.False(t, IsIPv6CIDR(testCase.input))
+			assert.Equal(t, testCase.expected, IsIPv6CIDR(testCase.input))
 		})
 	}
 }
@@ -268,13 +216,10 @@ func TestIsURL(t *testing.T) {
 		{"https://example.com/?", true},
 		{"https://example.com/api/v1/add?user=1", true},
 	}
+
 	for _, testCase := range testCases {
 		t.Run(testCase.input, func(t *testing.T) {
-			if testCase.expected {
-				assert.True(t, IsURL(testCase.input))
-				return
-			}
-			assert.False(t, IsURL(testCase.input))
+			assert.Equal(t, testCase.expected, IsURL(testCase.input))
 		})
 	}
 }

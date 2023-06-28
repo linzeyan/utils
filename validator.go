@@ -10,7 +10,8 @@ import (
 	"strings"
 )
 
-func hasNullByte(data []byte) bool {
+/* HasNullByteInFile checks the byte slice has the ASCII 0 or not. */
+func HasNullByte(data []byte) bool {
 	for _, b := range data {
 		if b == 0 {
 			return true
@@ -19,25 +20,25 @@ func hasNullByte(data []byte) bool {
 	return false
 }
 
-/* HasNullByteInFile checks the file has the ASCII 0 or not. */
+/* HasNullByteInFile checks the file has the ASCII 0, if ReadFile error returns false and error. */
 func HasNullByteInFile(filePath string) (bool, error) {
 	f, err := os.ReadFile(filePath)
 	if err != nil {
 		return false, err
 	}
-	return hasNullByte(f), nil
+	return HasNullByte(f), nil
 }
 
-/* HasNullByteInReader checks the reader has the ASCII 0 or not. */
+/* HasNullByteInReader checks the reader has the ASCII 0, if ReadAll error returns false and error. */
 func HasNullByteInReader(r io.Reader) (bool, error) {
 	data, err := io.ReadAll(r)
 	if err != nil {
 		return false, err
 	}
-	return hasNullByte(data), nil
+	return HasNullByte(data), nil
 }
 
-/* IsDomain checks if i is a domain. */
+/* IsDomain checks if i is a valid domain. */
 func IsDomain(i any) bool {
 	const elements = "~!@#$%^&*()_+`={}|[]\\:\"<>?,/"
 	if val, ok := i.(string); ok {
@@ -67,55 +68,37 @@ func IsPathExist(f string) bool {
 /* IsIP checks if i is an IP address. */
 func IsIP(i string) bool {
 	ip, err := netip.ParseAddr(i)
-	if err != nil {
-		return false
-	}
-	return ip.IsValid()
+	return err == nil && ip.IsValid()
 }
 
 /* IsCIDR checks if i is a valid CIDR. */
 func IsCIDR(i string) bool {
 	ip, err := netip.ParsePrefix(i)
-	if err != nil {
-		return false
-	}
-	return ip.IsValid()
+	return err == nil && ip.IsValid()
 }
 
 /* IsIPv4 checks if i is an ipv4 address. */
 func IsIPv4(i string) bool {
 	ip, err := netip.ParseAddr(i)
-	if err != nil {
-		return false
-	}
-	return ip.Is4()
+	return err == nil && ip.Is4()
 }
 
 /* IsIPv4CIDR checks if i is a valid IPv4 CIDR. */
 func IsIPv4CIDR(i string) bool {
 	ip, err := netip.ParsePrefix(i)
-	if err != nil {
-		return false
-	}
-	return ip.IsValid() && ip.Addr().Is4()
+	return err == nil && ip.IsValid() && ip.Addr().Is4()
 }
 
 /* IsIPv6 checks if i is an ipv6 address. */
 func IsIPv6(i string) bool {
 	ip, err := netip.ParseAddr(i)
-	if err != nil {
-		return false
-	}
-	return ip.Is6()
+	return err == nil && ip.Is6()
 }
 
 /* IsIPv6CIDR checks if i is a valid IPv6 CIDR. */
 func IsIPv6CIDR(i string) bool {
 	ip, err := netip.ParsePrefix(i)
-	if err != nil {
-		return false
-	}
-	return ip.IsValid() && ip.Addr().Is6()
+	return err == nil && ip.IsValid() && ip.Addr().Is6()
 }
 
 /* IsURL checks if u is a valid url. */
