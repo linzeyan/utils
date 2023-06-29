@@ -34,6 +34,9 @@ github.com/duke-git/lancet/v2/fileutil
 github.com/duke-git/lancet/v2/pointer
 github.com/duke-git/lancet/v2/structs
 github.com/duke-git/lancet/v2/validator
+# github.com/google/uuid v1.1.1
+## explicit
+github.com/google/uuid
 # github.com/klauspost/cpuid/v2 v2.0.9
 ## explicit; go 1.13
 github.com/klauspost/cpuid/v2
@@ -61,6 +64,9 @@ github.com/rs/zerolog
 github.com/rs/zerolog/internal/cbor
 github.com/rs/zerolog/internal/json
 github.com/rs/zerolog/log
+# github.com/sergi/go-diff v1.1.0
+## explicit; go 1.12
+github.com/sergi/go-diff/diffmatchpatch
 # github.com/stretchr/testify v1.8.1
 ## explicit; go 1.13
 github.com/stretchr/testify/assert
@@ -93,6 +99,16 @@ github.com/xuri/excelize/v2
 # github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22
 ## explicit; go 1.15
 github.com/xuri/nfp
+# go.opencensus.io v0.22.3
+## explicit; go 1.13
+go.opencensus.io/internal/tagencoding
+go.opencensus.io/metric/metricdata
+go.opencensus.io/metric/metricproducer
+go.opencensus.io/resource
+go.opencensus.io/stats
+go.opencensus.io/stats/internal
+go.opencensus.io/stats/view
+go.opencensus.io/tag
 # golang.org/x/arch v0.0.0-20210923205945-b76863e36670
 ## explicit; go 1.17
 golang.org/x/arch/x86/x86asm
@@ -135,6 +151,14 @@ golang.org/x/text/message
 golang.org/x/text/message/catalog
 golang.org/x/text/runes
 golang.org/x/text/transform
+# golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1
+## explicit
+golang.org/x/time/rate
+# googlemaps.github.io/maps v1.5.0
+## explicit; go 1.14
+googlemaps.github.io/maps
+googlemaps.github.io/maps/internal
+googlemaps.github.io/maps/metrics
 # gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
 ## explicit; go 1.11
 # gopkg.in/yaml.v3 v3.0.1
