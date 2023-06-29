@@ -6,7 +6,6 @@ require (
 	github.com/bytedance/sonic v1.9.2
 	github.com/duke-git/lancet/v2 v2.2.2
 	github.com/rs/zerolog v1.29.1
-	github.com/sergi/go-diff v1.1.0
 	github.com/stretchr/testify v1.8.1
 	github.com/xuri/excelize/v2 v2.7.1
 	googlemaps.github.io/maps v1.5.0
