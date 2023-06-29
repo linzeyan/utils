@@ -64,7 +64,7 @@ func CopyFile(src, dst string) error {
 }
 
 /* ListFiles returns a slice containing file paths for a given content type and file extension. */
-func ListFiles(dir, contentType string, fileExteinsion ...string) []string {
+func ListFiles(dir, contentType string, fileExtension ...string) []string {
 	var files []string
 	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -81,12 +81,12 @@ func ListFiles(dir, contentType string, fileExteinsion ...string) []string {
 			return nil
 		}
 		var fileExt []bool
-		for _, v := range fileExteinsion {
+		for _, v := range fileExtension {
 			if filepath.Ext(path) != v {
 				fileExt = append(fileExt, true)
 			}
 		}
-		if len(fileExteinsion) == len(fileExt) {
+		if len(fileExtension) == len(fileExt) {
 			return nil
 		}
 		files = append(files, path)
