@@ -21,12 +21,11 @@ const (
 
 /* CopyByReader copies the src Reader to the dst Writer. */
 func CopyByReader(src io.Reader, dst io.Writer, buffer ...[]byte) error {
-	if len(buffer) == 0 {
-		buffer = append(buffer, make([]byte, 1024*4))
-	}
-	buf := buffer[0]
-	if buf == nil {
-		buf = make([]byte, 1024*4)
+	buf := make([]byte, 1024*4)
+	if len(buffer) != 0 {
+		if buffer[0] != nil {
+			buf = buffer[0]
+		}
 	}
 	for {
 		n, err := src.Read(buf)
@@ -67,6 +66,9 @@ func CopyFile(src, dst string) error {
 	}()
 
 	buf := make([]byte, 1024*4)
+	if sourceFileStat.Size() > 100*(1<<20) {
+		buf = make([]byte, 1024*1024)
+	}
 	return CopyByReader(source, destination, buf)
 }
 

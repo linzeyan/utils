@@ -279,11 +279,7 @@ func TestToInt64(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(fmt.Sprintf("%v", testCase.data), func(*testing.T) {
-			i, err := ToInt64(testCase.data)
-			if err != nil {
-				assertion.Error(err)
-			}
-			assertion.Equal(testCase.expected, i)
+			assertion.Equal(testCase.expected, ToInt64(testCase.data))
 		})
 	}
 }

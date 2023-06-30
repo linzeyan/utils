@@ -3,7 +3,6 @@ package utils
 import (
 	"bytes"
 	"encoding/csv"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -14,7 +13,6 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/duke-git/lancet/v2/convertor"
-	"github.com/rs/zerolog/log"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -26,7 +24,7 @@ func ConvertExcel(filePath, ext string, delimiter rune) error {
 	}
 	defer func() {
 		if err := excelFile.Close(); err != nil {
-			log.Fatal().Msgf("%v", err)
+			printError(err)
 		}
 	}()
 
@@ -40,17 +38,17 @@ func ConvertExcel(filePath, ext string, delimiter rune) error {
 		writer.Comma = delimiter
 		rows, err := excelFile.GetRows(sheetName)
 		if err != nil {
-			return fmt.Errorf("get rows: %w", err)
+			return wrapError(err)
 		}
 		for _, row := range rows {
 			if err = writer.Write(row); err != nil {
-				return fmt.Errorf("write: %w", err)
+				return wrapError(err)
 			}
 		}
 		writer.Flush()
 		csvFile.Close()
 		if err = writer.Error(); err != nil {
-			return fmt.Errorf("flush: %w", err)
+			return wrapError(err)
 		}
 	}
 	return nil
@@ -81,7 +79,7 @@ func ConvertStringToCharByte(s string) ([]byte, error) {
 func ConvertStringToCharRune(s string) (rune, error) {
 	r, _, _, err := strconv.UnquoteChar(s, '\'')
 	if err != nil {
-		return 0, err
+		return 0, wrapError(err)
 	}
 	return r, nil
 }
@@ -110,11 +108,11 @@ func JSONUnmarshalString(data string, v any) error {
 func RemoveNullByteInFile(filePath string) error {
 	stat, err := os.Stat(filePath)
 	if err != nil {
-		return err
+		return wrapError(err)
 	}
 	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return err
+		return wrapError(err)
 	}
 	b := RemoveNullByte(data)
 	return os.WriteFile(filePath, b, stat.Mode())
@@ -124,7 +122,7 @@ func RemoveNullByteInFile(filePath string) error {
 func RemoveNullByteInReader(reader io.Reader) (io.Reader, error) {
 	r, err := io.ReadAll(reader)
 	if err != nil {
-		return nil, err
+		return nil, wrapError(err)
 	}
 	b := RemoveNullByte(r)
 	buf := bytes.NewBuffer(b)
@@ -140,15 +138,15 @@ func RemoveNullByte(data []byte) []byte {
 func ReplaceDelimiter(filePath string, old, new string) error {
 	f, err := os.ReadFile(filePath)
 	if err != nil {
-		return fmt.Errorf("read file: %w", err)
+		return wrapError(err)
 	}
 	stat, err := os.Stat(filePath)
 	if err != nil {
-		return fmt.Errorf("stat file: %w", err)
+		return wrapError(err)
 	}
 	b, err := ConvertStringToCharByte(new)
 	if err != nil {
-		return fmt.Errorf("converts: %w", err)
+		return wrapError(err)
 	}
 	eol := regexp.MustCompile(old)
 	f = eol.ReplaceAllLiteral(f, b)
@@ -159,18 +157,20 @@ func ReplaceDelimiter(filePath string, old, new string) error {
 func ReplaceDosToUnix(filePath string) error {
 	f, err := os.ReadFile(filePath)
 	if err != nil {
-		return fmt.Errorf("read file: %w", err)
+		return wrapError(err)
 	}
 	stat, err := os.Stat(filePath)
 	if err != nil {
-		return fmt.Errorf("stat file: %w", err)
+		return wrapError(err)
 	}
 	eol := regexp.MustCompile(`\r\n`)
 	f = eol.ReplaceAllLiteral(f, []byte{'\n'})
 	return os.WriteFile(filePath, f, stat.Mode())
 }
 
-/* ToInt64 converts v to int64 value, if input is not numerical, return 0 and error. */
-func ToInt64(v any) (int64, error) {
-	return convertor.ToInt(v)
+/* ToInt64 converts v to int64 value, if input is not numerical, return 0. */
+func ToInt64(v any) int64 {
+	i, err := convertor.ToInt(v)
+	printError(err)
+	return i
 }
