@@ -12,6 +12,13 @@ import (
 	"github.com/duke-git/lancet/v2/fileutil"
 )
 
+const (
+	ModeReadOnly  = fs.FileMode(0444)
+	ModeRead      = fs.FileMode(0644)
+	ModeReadWrite = fs.FileMode(0666)
+	ModeReadExec  = fs.FileMode(0755)
+)
+
 /* CopyByReader copies the src Reader to the dst Writer. */
 func CopyByReader(src io.Reader, dst io.Writer, buffer ...[]byte) error {
 	if len(buffer) == 0 {

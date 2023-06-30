@@ -2,6 +2,8 @@ package utils
 
 import (
 	"bufio"
+	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -15,10 +17,28 @@ import (
 
 const testDir = "testdata"
 
-func createDir(dir string) {
-	err := os.MkdirAll(dir, os.ModePerm)
+func createDir(dir string, mode ...fs.FileMode) {
+	m := os.ModePerm
+	if len(mode) != 0 {
+		m = mode[0]
+	}
+	err := os.MkdirAll(dir, m)
 	if err != nil {
 		log.Fatal().Msgf("%v", err)
+	}
+}
+
+func TestConstMode(t *testing.T) {
+	assertion := assert.New(t)
+	requirement := require.New(t)
+	for i, v := range []fs.FileMode{ModeRead, ModeReadOnly, ModeReadExec} {
+		dir := fmt.Sprintf("%s%d", testDir, i)
+		createDir(dir, v)
+		defer os.RemoveAll(dir)
+		stat, err := os.Stat(dir)
+		requirement.Nil(err)
+		requirement.DirExists(dir)
+		assertion.Equal(v.Perm(), stat.Mode().Perm())
 	}
 }
 
