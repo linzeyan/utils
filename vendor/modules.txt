@@ -29,11 +29,7 @@ github.com/chenzhuoyu/base64x
 github.com/davecgh/go-spew/spew
 # github.com/duke-git/lancet/v2 v2.2.2
 ## explicit; go 1.18
-github.com/duke-git/lancet/v2/convertor
 github.com/duke-git/lancet/v2/fileutil
-github.com/duke-git/lancet/v2/pointer
-github.com/duke-git/lancet/v2/structs
-github.com/duke-git/lancet/v2/validator
 # github.com/google/uuid v1.1.1
 ## explicit
 github.com/google/uuid

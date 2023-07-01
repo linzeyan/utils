@@ -61,9 +61,7 @@ func TestConvertExcel(t *testing.T) {
 		})
 	}
 
-	if err := os.RemoveAll(testDir); err != nil {
-		requirement.Error(err)
-	}
+	requirement.Nil(os.RemoveAll(testDir))
 }
 
 func TestConvertStringToChar(t *testing.T) {
@@ -109,9 +107,7 @@ func TestRemoveNullByteInFile(t *testing.T) {
 	for _, testCase := range testCases {
 		file := filepath.Join(testDir, "test.txt")
 		err := os.WriteFile(file, testCase.data, os.ModePerm)
-		if err != nil {
-			requirement.Error(err)
-		}
+		requirement.Nil(err)
 
 		t.Run(testCase.name, func(*testing.T) {
 			b0, err := HasNullByteInFile(file)
@@ -124,9 +120,7 @@ func TestRemoveNullByteInFile(t *testing.T) {
 			assertion.Equal(testCase.expected, b)
 		})
 	}
-	if err := os.RemoveAll(testDir); err != nil {
-		requirement.Error(err)
-	}
+	requirement.Nil(os.RemoveAll(testDir))
 }
 
 func TestRemoveNullByte(t *testing.T) {
@@ -146,13 +140,9 @@ func TestRemoveNullByte(t *testing.T) {
 	for _, testCase := range testCases {
 		file := filepath.Join(testDir, "test.txt")
 		err := os.WriteFile(file, testCase.data, os.ModePerm)
-		if err != nil {
-			requirement.Error(err)
-		}
+		requirement.Nil(err)
 		data, err := os.Open(file)
-		if err != nil {
-			requirement.Error(err)
-		}
+		requirement.Nil(err)
 		defer data.Close()
 		t.Run(testCase.name, func(*testing.T) {
 			b0, err := HasNullByteInReader(data)
@@ -165,9 +155,7 @@ func TestRemoveNullByte(t *testing.T) {
 			assertion.Equal(testCase.expected, b)
 		})
 	}
-	if err := os.RemoveAll(testDir); err != nil {
-		requirement.Error(err)
-	}
+	requirement.Nil(os.RemoveAll(testDir))
 }
 
 func TestReplaceDelimiter(t *testing.T) {
@@ -185,17 +173,11 @@ func TestReplaceDelimiter(t *testing.T) {
 	for _, testCase := range testCases {
 		file := filepath.Join(testDir, "test.txt")
 		err := os.WriteFile(file, []byte(strings.Join(testCase.data, ",")), os.ModePerm)
-		if err != nil {
-			requirement.Error(err)
-		}
+		requirement.Nil(err)
 		err = ReplaceDelimiter(file, ",", "|")
-		if err != nil {
-			requirement.Error(err)
-		}
+		requirement.Nil(err)
 		b, err := os.ReadFile(file)
-		if err != nil {
-			requirement.Error(err)
-		}
+		requirement.Nil(err)
 		var counter, unexpectd int
 		for _, c := range b {
 			if c == '|' {
@@ -210,9 +192,7 @@ func TestReplaceDelimiter(t *testing.T) {
 			assertion.Equal(0, unexpectd)
 		})
 	}
-	if err := os.RemoveAll(testDir); err != nil {
-		requirement.Error(err)
-	}
+	requirement.Nil(os.RemoveAll(testDir))
 }
 
 func TestReplaceDosToUnix(t *testing.T) {
@@ -230,17 +210,11 @@ func TestReplaceDosToUnix(t *testing.T) {
 	for _, testCase := range testCases {
 		file := filepath.Join(testDir, "test.txt")
 		err := os.WriteFile(file, []byte(strings.Join(testCase.data, "\r\n")), os.ModePerm)
-		if err != nil {
-			requirement.Error(err)
-		}
+		requirement.Nil(err)
 		err = ReplaceDosToUnix(file)
-		if err != nil {
-			requirement.Error(err)
-		}
+		requirement.Nil(err)
 		b, err := os.ReadFile(file)
-		if err != nil {
-			requirement.Error(err)
-		}
+		requirement.Nil(err)
 		var counter, unexpectd int
 		for _, c := range b {
 			if c == '\n' {
@@ -255,31 +229,5 @@ func TestReplaceDosToUnix(t *testing.T) {
 			assertion.Equal(0, unexpectd)
 		})
 	}
-	if err := os.RemoveAll(testDir); err != nil {
-		requirement.Error(err)
-	}
-}
-
-func TestToInt64(t *testing.T) {
-	assertion := assert.New(t)
-	testCases := []struct {
-		data     any
-		expected int64
-	}{
-		{data: "123", expected: 123},
-		{data: 456, expected: 456},
-		{data: byte(255), expected: 255},
-		{data: rune(111), expected: 111},
-		{data: 077, expected: 63},
-		{data: 0x77, expected: 119},
-		{data: 0b1111, expected: 15},
-		{data: map[string]string{}, expected: 0},
-		{data: [2]int{1}, expected: 0},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(fmt.Sprintf("%v", testCase.data), func(*testing.T) {
-			assertion.Equal(testCase.expected, ToInt64(testCase.data))
-		})
-	}
+	requirement.Nil(os.RemoveAll(testDir))
 }

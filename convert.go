@@ -12,7 +12,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/bytedance/sonic"
-	"github.com/duke-git/lancet/v2/convertor"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -166,11 +165,4 @@ func ReplaceDosToUnix(filePath string) error {
 	eol := regexp.MustCompile(`\r\n`)
 	f = eol.ReplaceAllLiteral(f, []byte{'\n'})
 	return os.WriteFile(filePath, f, stat.Mode())
-}
-
-/* ToInt64 converts v to int64 value, if input is not numerical, return 0. */
-func ToInt64(v any) int64 {
-	i, err := convertor.ToInt(v)
-	printError(err)
-	return i
 }

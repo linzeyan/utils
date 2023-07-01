@@ -10,7 +10,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -23,9 +22,7 @@ func createDir(dir string, mode ...fs.FileMode) {
 		m = mode[0]
 	}
 	err := os.MkdirAll(dir, m)
-	if err != nil {
-		log.Fatal().Msgf("%v", err)
-	}
+	logFatal(err)
 }
 
 func TestConstMode(t *testing.T) {
@@ -53,21 +50,17 @@ func TestCopyFile(t *testing.T) {
 
 	err = CopyFile(srcFile, dstFile)
 	if err != nil {
-		assert.FileExistsf(t, dstFile, "dstFile not found")
-		requirement.Error(err)
+		requirement.FileExistsf(dstFile, "dstFile not found")
 		_, ferr := os.Open(dstFile)
-		if ferr != nil {
-			requirement.Error(ferr)
-		}
+		requirement.Nil(ferr)
 	}
+	assertion.Nil(err)
 	src, err := os.ReadFile(srcFile)
 	requirement.Nil(err)
 	dst, err := os.ReadFile(dstFile)
 	requirement.Nil(err)
 	assertion.Equal(src, dst)
-	if err := os.RemoveAll(testDir); err != nil {
-		requirement.Error(err)
-	}
+	requirement.Nil(os.RemoveAll(testDir))
 }
 
 func TestCopyByReader(t *testing.T) {
@@ -96,9 +89,7 @@ func TestCopyByReader(t *testing.T) {
 	dstData, err := os.ReadFile(dstFile)
 	requirement.Nil(err)
 	assertion.Equal(srcData, dstData)
-	if err := os.RemoveAll(testDir); err != nil {
-		requirement.Error(err)
-	}
+	requirement.Nil(os.RemoveAll(testDir))
 }
 
 func TestListFiles(t *testing.T) {
@@ -126,9 +117,7 @@ func TestListFiles(t *testing.T) {
 			assertion.FileExists(files[i])
 		}
 	}
-	if err := os.RemoveAll(testDir); err != nil {
-		requirement.Error(err)
-	}
+	requirement.Nil(os.RemoveAll(testDir))
 }
 
 func TestSkipFirstRow(t *testing.T) {
@@ -160,9 +149,7 @@ func TestSkipFirstRow(t *testing.T) {
 		}
 		f.Close()
 	}
-	if err := os.RemoveAll(testDir); err != nil {
-		requirement.Error(err)
-	}
+	requirement.Nil(os.RemoveAll(testDir))
 }
 
 func TestZipAndUnZip(t *testing.T) {
@@ -190,7 +177,5 @@ func TestZipAndUnZip(t *testing.T) {
 	newSrcData, err := os.ReadFile(srcFile)
 	requirement.Nil(err)
 	assertion.Equal(rawSrcData, newSrcData)
-	if err := os.RemoveAll(testDir); err != nil {
-		requirement.Error(err)
-	}
+	requirement.Nil(os.RemoveAll(testDir))
 }
