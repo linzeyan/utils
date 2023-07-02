@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,8 +19,8 @@ func TestGoogleMapsDirections(t *testing.T) {
 		Destination: "Glebe Pt Rd, Glebe",
 		Mode:        maps.TravelModeTransit,
 	}
-
-	result, _, err := GoogleMapsAPINewClient(api).Directions(r)
+	ctx := context.Background()
+	result, _, err := GoogleMapsAPINewClient(api).Directions(ctx, r)
 	requirement.Nil(err)
 	_, err = JSONMarshalString(result[0])
 	assertion.Nil(err)
@@ -33,7 +34,8 @@ func TestGoogleMapsDistanceMatrix(t *testing.T) {
 		Origins:      []string{},
 		Destinations: []string{},
 	}
-	result, err := GoogleMapsAPINewClient(api).DistanceMatrix(r)
+	ctx := context.Background()
+	result, err := GoogleMapsAPINewClient(api).DistanceMatrix(ctx, r)
 	requirement.Error(err)
 	_, err = JSONMarshalString(result)
 	assertion.Nil(err)
@@ -49,7 +51,8 @@ func TestGoogleMapsElevation(t *testing.T) {
 			{Lng: 120.8788299, Lat: 24.72969236},
 		},
 	}
-	result, err := GoogleMapsAPINewClient(api).Elevation(r)
+	ctx := context.Background()
+	result, err := GoogleMapsAPINewClient(api).Elevation(ctx, r)
 	requirement.Nil(err)
 	s, err := JSONMarshalString(result[0])
 	assertion.Nil(err)
@@ -65,7 +68,8 @@ func TestGoogleMapsGeocoding(t *testing.T) {
 			Lat: 24.72969236,
 		},
 	}
-	result, err := GoogleMapsAPINewClient(api).Geocode(r)
+	ctx := context.Background()
+	result, err := GoogleMapsAPINewClient(api).Geocode(ctx, r)
 	requirement.Nil(err)
 	_, err = JSONMarshalString(result[0])
 	assertion.Nil(err)
@@ -76,7 +80,8 @@ func TestGoogleMapsGeolocation(t *testing.T) {
 	assertion := assert.New(t)
 	requirement := require.New(t)
 	r := &maps.GeolocationRequest{}
-	result, err := GoogleMapsAPINewClient(api).Geolocate(r)
+	ctx := context.Background()
+	result, err := GoogleMapsAPINewClient(api).Geolocate(ctx, r)
 	requirement.Error(err)
 	_, err = JSONMarshalString(result)
 	assertion.Nil(err)
@@ -93,7 +98,8 @@ func TestGoogleMapsNearbySearch(t *testing.T) {
 		},
 		Radius: 100,
 	}
-	result, err := GoogleMapsAPINewClient(api).PlaceNearbySearch(r)
+	ctx := context.Background()
+	result, err := GoogleMapsAPINewClient(api).NearbySearch(ctx, r)
 	requirement.Nil(err)
 	_, err = JSONMarshalString(result)
 	assertion.Nil(err)
@@ -106,7 +112,8 @@ func TestGoogleMapsNearestRoads(t *testing.T) {
 	r := &maps.NearestRoadsRequest{
 		Points: []maps.LatLng{{Lng: 120.8788299, Lat: 24.72969236}},
 	}
-	result, err := GoogleMapsAPINewClient(api).RoadsNearest(r)
+	ctx := context.Background()
+	result, err := GoogleMapsAPINewClient(api).NearestRoads(ctx, r)
 	requirement.Nil(err)
 	_, err = JSONMarshalString(result)
 	assertion.Nil(err)
@@ -120,7 +127,8 @@ func TestGoogleMapsPlaceDetails(t *testing.T) {
 		PlaceID: "ChIJeSlIfru0aTQR0LK8Cz0vfDA",
 		Fields:  []maps.PlaceDetailsFieldMask{},
 	}
-	result, err := GoogleMapsAPINewClient(api).PlaceDetails(r)
+	ctx := context.Background()
+	result, err := GoogleMapsAPINewClient(api).PlaceDetails(ctx, r)
 	requirement.Nil(err)
 	_, err = JSONMarshalString(result)
 	assertion.Nil(err)
@@ -133,7 +141,8 @@ func TestGoogleMapsSnapToRoads(t *testing.T) {
 	r := &maps.SnapToRoadRequest{
 		Path: []maps.LatLng{{Lng: 120.8788299, Lat: 24.72969236}},
 	}
-	result, err := GoogleMapsAPINewClient(api).RoadsSnapTo(r)
+	ctx := context.Background()
+	result, err := GoogleMapsAPINewClient(api).SnapToRoad(ctx, r)
 	requirement.Nil(err)
 	_, err = JSONMarshalString(result)
 	assertion.Nil(err)
@@ -146,7 +155,8 @@ func TestGoogleMapsSpeedLimits(t *testing.T) {
 	r := &maps.SpeedLimitsRequest{
 		Path: []maps.LatLng{{Lng: 120.8788299, Lat: 24.72969236}},
 	}
-	result, err := GoogleMapsAPINewClient(api).RoadsSpeedLimits(r)
+	ctx := context.Background()
+	result, err := GoogleMapsAPINewClient(api).SpeedLimits(ctx, r)
 	requirement.Nil(err)
 	_, err = JSONMarshalString(result)
 	assertion.Nil(err)

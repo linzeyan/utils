@@ -1,61 +1,14 @@
 package utils
 
 import (
-	"context"
-
 	"googlemaps.github.io/maps"
 )
 
-type GoogleMapsAPI struct {
-	ctx    context.Context
-	Client *maps.Client
-}
-
-func GoogleMapsAPINewClient(apiKey string) *GoogleMapsAPI {
+/* GoogleMapsAPINewClient returns pointer of maps.Client with disables rate limiting. */
+func GoogleMapsAPINewClient(apiKey string) *maps.Client {
 	client, err := maps.NewClient(maps.WithAPIKey(apiKey), maps.WithRateLimit(0))
 	if err != nil {
 		panic(err)
 	}
-	ctx := context.Background()
-	return &GoogleMapsAPI{ctx: ctx, Client: client}
-}
-
-func (g *GoogleMapsAPI) Directions(req *maps.DirectionsRequest) ([]maps.Route, []maps.GeocodedWaypoint, error) {
-	return g.Client.Directions(g.ctx, req)
-}
-
-func (g *GoogleMapsAPI) DistanceMatrix(req *maps.DistanceMatrixRequest) (*maps.DistanceMatrixResponse, error) {
-	return g.Client.DistanceMatrix(g.ctx, req)
-}
-
-func (g *GoogleMapsAPI) Elevation(req *maps.ElevationRequest) ([]maps.ElevationResult, error) {
-	return g.Client.Elevation(g.ctx, req)
-}
-
-func (g *GoogleMapsAPI) Geocode(req *maps.GeocodingRequest) ([]maps.GeocodingResult, error) {
-	return g.Client.Geocode(g.ctx, req)
-}
-
-func (g *GoogleMapsAPI) Geolocate(req *maps.GeolocationRequest) (*maps.GeolocationResult, error) {
-	return g.Client.Geolocate(g.ctx, req)
-}
-
-func (g *GoogleMapsAPI) PlaceDetails(req *maps.PlaceDetailsRequest) (maps.PlaceDetailsResult, error) {
-	return g.Client.PlaceDetails(g.ctx, req)
-}
-
-func (g *GoogleMapsAPI) PlaceNearbySearch(req *maps.NearbySearchRequest) (maps.PlacesSearchResponse, error) {
-	return g.Client.NearbySearch(g.ctx, req)
-}
-
-func (g *GoogleMapsAPI) RoadsNearest(req *maps.NearestRoadsRequest) (*maps.NearestRoadsResponse, error) {
-	return g.Client.NearestRoads(g.ctx, req)
-}
-
-func (g *GoogleMapsAPI) RoadsSnapTo(req *maps.SnapToRoadRequest) (*maps.SnapToRoadResponse, error) {
-	return g.Client.SnapToRoad(g.ctx, req)
-}
-
-func (g *GoogleMapsAPI) RoadsSpeedLimits(req *maps.SpeedLimitsRequest) (*maps.SpeedLimitsResponse, error) {
-	return g.Client.SpeedLimits(g.ctx, req)
+	return client
 }
