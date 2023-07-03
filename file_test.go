@@ -22,10 +22,12 @@ func createDir(dir string, mode ...fs.FileMode) {
 		m = mode[0]
 	}
 	err := os.MkdirAll(dir, m)
-	logFatal(err)
+	if err != nil {
+		panic(err)
+	}
 }
 
-func TestConstMode(t *testing.T) {
+func TestFileMode(t *testing.T) {
 	assertion := assert.New(t)
 	requirement := require.New(t)
 	for i, v := range []fs.FileMode{ModeRead, ModeReadOnly, ModeReadExec} {
@@ -45,16 +47,14 @@ func TestCopyFile(t *testing.T) {
 	createDir(testDir)
 	srcFile := filepath.Join(testDir, "test.txt")
 	dstFile := filepath.Join(testDir, "text_copy.txt")
-	_, err := os.Create(srcFile)
-	requirement.Nil(err)
 
+	err := CopyFile(srcFile, dstFile)
+	requirement.Error(err)
+
+	_, err = os.Create(srcFile)
+	requirement.Nil(err)
 	err = CopyFile(srcFile, dstFile)
-	if err != nil {
-		requirement.FileExistsf(dstFile, "dstFile not found")
-		_, ferr := os.Open(dstFile)
-		requirement.Nil(ferr)
-	}
-	assertion.Nil(err)
+	requirement.Nil(err)
 	src, err := os.ReadFile(srcFile)
 	requirement.Nil(err)
 	dst, err := os.ReadFile(dstFile)
@@ -76,14 +76,10 @@ func TestCopyByReader(t *testing.T) {
 	requirement.Nil(err)
 	dst, err := os.Create(dstFile)
 	requirement.Nil(err)
-
 	err = CopyByReader(src, dst)
-	if err != nil {
-		assertion.FileExistsf(dstFile, "dstFile not found")
-		requirement.Error(err)
-	}
-	src.Close()
-	dst.Close()
+	requirement.Nil(err)
+	defer src.Close()
+	defer dst.Close()
 	srcData, err := os.ReadFile(srcFile)
 	requirement.Nil(err)
 	dstData, err := os.ReadFile(dstFile)
