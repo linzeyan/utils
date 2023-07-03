@@ -11,6 +11,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func FuzzHasNullByte(f *testing.F) {
+	f.Fuzz(func(t *testing.T, b []byte) {
+		assertion := assert.New(t)
+		assertion.False(HasNullByte(RemoveNullByte(b)))
+	})
+}
+
 func TestHasNullByte(t *testing.T) {
 	assertion := assert.New(t)
 	requirement := require.New(t)
