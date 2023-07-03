@@ -29,17 +29,15 @@ func TestHasNullByte(t *testing.T) {
 		file := filepath.Join(testDir, "test.txt")
 		err := os.WriteFile(file, testCase.data, os.ModePerm)
 		requirement.Nil(err)
-		t.Run("InFile "+testCase.name, func(*testing.T) {
-			b, err := HasNullByteInFile(file)
-			assertion.Nil(err)
+		t.Run("InFile"+testCase.name, func(*testing.T) {
+			b := HasNullByteInFile(file)
 			assertion.Equal(testCase.expected, b)
 		})
 		f, err := os.Open(file)
 		requirement.Nil(err)
 		defer f.Close()
-		t.Run("InReader "+testCase.name, func(*testing.T) {
-			b, err := HasNullByteInReader(f)
-			assertion.Nil(err)
+		t.Run("InReader"+testCase.name, func(*testing.T) {
+			b := HasNullByteInReader(f)
 			assertion.Equal(testCase.expected, b)
 		})
 	}

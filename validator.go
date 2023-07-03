@@ -20,22 +20,22 @@ func HasNullByte(data []byte) bool {
 	return false
 }
 
-/* HasNullByteInFile checks the file has the ASCII 0, if ReadFile error returns false and error. */
-func HasNullByteInFile(filePath string) (bool, error) {
-	f, err := os.ReadFile(filePath)
+/* HasNullByteInFile checks the file has the ASCII 0. */
+func HasNullByteInFile(filePath string) bool {
+	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return false, err
+		panic(err)
 	}
-	return HasNullByte(f), nil
+	return HasNullByte(data)
 }
 
-/* HasNullByteInReader checks the reader has the ASCII 0, if ReadAll error returns false and error. */
-func HasNullByteInReader(r io.Reader) (bool, error) {
+/* HasNullByteInReader checks the reader has the ASCII 0. */
+func HasNullByteInReader(r io.Reader) bool {
 	data, err := io.ReadAll(r)
 	if err != nil {
-		return false, err
+		panic(err)
 	}
-	return HasNullByte(data), nil
+	return HasNullByte(data)
 }
 
 /* IsDomain checks if i is a valid domain. */
