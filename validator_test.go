@@ -51,10 +51,14 @@ func TestIsDomain(t *testing.T) {
 	}{
 		{"1.1.1.1", false},
 		{"example.com", true},
+		{"example_.com", false},
+		{"example+1.com", false},
 		{"Hello world", false},
 		{11111, false},
 		{"dns-admin.google.com", true},
 		{"dns-admin.google.com.", true},
+		{"dns-admin.google.111", false},
+		{"dns-admin.google.111.", false},
 	}
 
 	for _, testCase := range testCases {

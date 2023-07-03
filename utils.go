@@ -9,7 +9,7 @@ import (
 )
 
 func createDir(dir string, mode ...fs.FileMode) {
-	m := os.ModePerm
+	m := fs.ModePerm
 	if len(mode) != 0 {
 		m = mode[0]
 	}

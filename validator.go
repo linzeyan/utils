@@ -41,22 +41,34 @@ func HasNullByteInReader(r io.Reader) bool {
 /* IsDomain checks if i is a valid domain. */
 func IsDomain(i any) bool {
 	const elements = "~!@#$%^&*()_+`={}|[]\\:\"<>?,/"
-	if val, ok := i.(string); ok {
-		if strings.ContainsAny(val, elements) {
-			return false
-		}
-		slice := strings.Split(val, ".")
-		l := len(slice)
-		if l > 1 {
-			n, err := strconv.Atoi(slice[l-1])
-			if err != nil {
-				return true
-			}
-			s := strconv.Itoa(n)
-			return slice[l-1] != s
-		}
+	val, ok := i.(string)
+	if !ok {
+		return false
 	}
-	return false
+	if strings.ContainsAny(val, elements) {
+		return false
+	}
+
+	raw := strings.Split(val, ".")
+	rawLength := len(raw)
+	if rawLength < 2 {
+		return false
+	}
+	rawLast := raw[rawLength-1]
+
+	var slice []string
+	if rawLast == "" {
+		slice = raw[:rawLength-1]
+	} else {
+		slice = raw
+	}
+	length := len(slice)
+	if length < 2 {
+		return false
+	}
+	last := slice[length-1]
+	_, err := strconv.Atoi(last)
+	return err != nil
 }
 
 /* IsPathExist checks if f is a valid path. */
