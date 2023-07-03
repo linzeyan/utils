@@ -24,7 +24,7 @@ func HasNullByte(data []byte) bool {
 func HasNullByteInFile(filePath string) bool {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
-		panic(err)
+		logPanic(err)
 	}
 	return HasNullByte(data)
 }
@@ -33,7 +33,7 @@ func HasNullByteInFile(filePath string) bool {
 func HasNullByteInReader(r io.Reader) bool {
 	data, err := io.ReadAll(r)
 	if err != nil {
-		panic(err)
+		logPanic(err)
 	}
 	return HasNullByte(data)
 }

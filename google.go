@@ -8,7 +8,7 @@ import (
 func GoogleMapsAPINewClient(apiKey string) *maps.Client {
 	client, err := maps.NewClient(maps.WithAPIKey(apiKey), maps.WithRateLimit(0))
 	if err != nil {
-		panic(err)
+		logPanic(err)
 	}
 	return client
 }

@@ -16,15 +16,14 @@ import (
 
 const testDir = "testdata"
 
-func createDir(dir string, mode ...fs.FileMode) {
-	m := os.ModePerm
-	if len(mode) != 0 {
-		m = mode[0]
-	}
-	err := os.MkdirAll(dir, m)
-	if err != nil {
-		panic(err)
-	}
+func TestCreateDir(t *testing.T) {
+	requirement := require.New(t)
+	requirement.Panics(func() {
+		createDir("")
+	})
+	createDir(testDir)
+	requirement.DirExists(testDir)
+	requirement.Nil(os.RemoveAll(testDir))
 }
 
 func TestFileMode(t *testing.T) {
