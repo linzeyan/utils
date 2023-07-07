@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"encoding/csv"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -12,6 +13,10 @@ import (
 	"unicode/utf8"
 
 	"github.com/bytedance/sonic"
+	"github.com/xitongsys/parquet-go-source/local"
+	"github.com/xitongsys/parquet-go/parquet"
+	"github.com/xitongsys/parquet-go/source"
+	"github.com/xitongsys/parquet-go/writer"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -101,6 +106,25 @@ func JSONUnmarshal(data []byte, v any) error {
 /* JSONUnmarshalString is like JSONUnmarshal, except buf is a string. */
 func JSONUnmarshalString(data string, v any) error {
 	return sonic.UnmarshalString(data, v)
+}
+
+/*
+ParquetWriter creates the file and a ParquetWriter capable of writing data in parquet format,
+obj is a object with tags or JSON schema string.
+*/
+func ParquetWriter(dstFile string, obj any) (source.ParquetFile, *writer.ParquetWriter, error) {
+	fw, err := local.NewLocalFileWriter(dstFile)
+	if err != nil {
+		return nil, nil, fmt.Errorf("writer: %w", err)
+	}
+	pw, err := writer.NewParquetWriter(fw, obj, 4)
+	if err != nil {
+		return nil, nil, fmt.Errorf("parquet handler: %w", err)
+	}
+	pw.RowGroupSize = 128 * 1024 * 1024 //128M
+	pw.PageSize = 8 * 1024              //8K
+	pw.CompressionType = parquet.CompressionCodec_ZSTD
+	return fw, pw, nil
 }
 
 /* RemoveNullByteInFile removes the ASCII 0 in the file. */
