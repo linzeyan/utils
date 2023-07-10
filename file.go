@@ -31,6 +31,9 @@ func CopyByReader(src io.Reader, dst io.Writer, buffer ...[]byte) error {
 		n, err := src.Read(buf)
 		if err != nil {
 			if err == io.EOF {
+				if _, err := dst.Write(buf[:n]); err != nil {
+					return fmt.Errorf("write: %w", err)
+				}
 				return nil
 			}
 			return fmt.Errorf("read: %w", err)
